@@ -68,7 +68,8 @@ func LifeSupport(inputs []string) uint64 {
 		for j, input := range inputs {
 			// We keep track of indexes we want to include in the results
 			// so only count if the index is being tracked
-			if i == 0 || oxygenIndexes[j] && len(oxygenIndexes) > 1 {
+			// and always count the first iteration because the initial map is empty
+			if i == 0 || oxygenIndexes[j] && len(oxygenIndexes) != 1 {
 				if input[i] == '1' {
 					oxygenTracking.OneCount++
 					oxygenTracking.OneIndexes[j] = true
@@ -78,7 +79,7 @@ func LifeSupport(inputs []string) uint64 {
 				}
 			}
 
-			if i == 0 || co2Indexes[j] && len(co2Indexes) > 1 {
+			if i == 0 || co2Indexes[j] && len(co2Indexes) != 1 {
 				if input[i] == '1' {
 					co2Tracking.OneCount++
 					co2Tracking.OneIndexes[j] = true
@@ -88,8 +89,6 @@ func LifeSupport(inputs []string) uint64 {
 				}
 			}
 		}
-
-		// fmt.Printf("i: %d l: %v 1-count: %d length: %d\n", i, oxygens, oneCount, len(oxygens))
 
 		if i == 0 || len(oxygenIndexes) > 1 {
 			if oxygenTracking.OneCount >= oxygenTracking.ZeroCount {
@@ -122,8 +121,6 @@ func LifeSupport(inputs []string) uint64 {
 		co2 = inputs[i]
 	}
 
-	fmt.Printf("oxygen: %s co2: %s\n", oxygen, co2)
-
 	o, err := strconv.ParseUint(oxygen, 2, 32)
 	if err != nil {
 		panic(err)
@@ -133,6 +130,8 @@ func LifeSupport(inputs []string) uint64 {
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Printf("oxygen: %s -> %d co2: %s -> %d\n", oxygen, o, co2, c)
 
 	return o * c
 }
