@@ -5,12 +5,12 @@ import (
 	"strconv"
 )
 
-func Gamma(inputs []string) uint64 {
+func PowerConsumption(inputs []string) uint64 {
 	gamma := make([]rune, len(inputs[0]))
 	epsilon := make([]rune, len(inputs[0]))
 
 OUT:
-	for i := 0; i < len(inputs[0]); i++ {
+	for i := range inputs[0] {
 		gamma[i] = '0'
 		epsilon[i] = '1'
 		oneCount := 0
@@ -61,7 +61,7 @@ func LifeSupport(inputs []string) uint64 {
 	oxygenIndexes := map[int]bool{}
 	co2Indexes := map[int]bool{}
 
-	for i := 0; i < len(inputs[0]); i++ {
+	for i := range inputs[0] {
 		oxygenTracking := NewTracker()
 		co2Tracking := NewTracker()
 
@@ -99,10 +99,10 @@ func LifeSupport(inputs []string) uint64 {
 		}
 
 		if i == 0 || len(co2Indexes) > 1 {
-			if co2Tracking.OneCount >= co2Tracking.ZeroCount {
-				co2Indexes = co2Tracking.ZeroIndexes
-			} else {
+			if co2Tracking.OneCount < co2Tracking.ZeroCount {
 				co2Indexes = co2Tracking.OneIndexes
+			} else {
+				co2Indexes = co2Tracking.ZeroIndexes
 			}
 		}
 
@@ -134,4 +134,55 @@ func LifeSupport(inputs []string) uint64 {
 	fmt.Printf("oxygen: %s -> %d co2: %s -> %d\n", oxygen, o, co2, c)
 
 	return o * c
+}
+
+func LifeSupportSeparated(inputs []string) uint64 {
+	oxygen := findCommon(inputs, func(a, b int) bool { return a >= b })
+	co2 := findCommon(inputs, func(a, b int) bool { return a < b })
+
+	o, err := strconv.ParseUint(oxygen, 2, 32)
+	if err != nil {
+		panic(err)
+	}
+
+	c, err := strconv.ParseUint(co2, 2, 32)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("oxygen: %s -> %d co2: %s -> %d\n", oxygen, o, co2, c)
+
+	return c * o
+}
+
+func findCommon(inputs []string, compare func(int, int) bool) string {
+	filtered := inputs
+	i := 0
+
+	for len(filtered) > 1 {
+		onesCount := 0
+		zerosCount := 0
+		ones := []string{}
+		zeros := []string{}
+
+		for _, input := range filtered {
+			if input[i] == '1' {
+				onesCount++
+				ones = append(ones, input)
+			} else {
+				zerosCount++
+				zeros = append(zeros, input)
+			}
+		}
+
+		if compare(onesCount, zerosCount) {
+			filtered = ones
+		} else {
+			filtered = zeros
+		}
+
+		i++
+	}
+
+	return filtered[0]
 }
