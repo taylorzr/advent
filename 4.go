@@ -6,26 +6,25 @@ import (
 	"strings"
 )
 
-type Loc struct {
-	X int
-	Y int
+type Item struct {
+	X    int
+	Y    int
+	Seen bool
 }
 
 type Board struct {
 	Input      string
 	ColumnHits []int
 	RowHits    []int
-	Mapping    map[int]Loc
-	Seen       map[int]bool
+	Items      map[int]*Item
 	Winner     int
 	Won        bool
 }
 
 func NewBoard(input string) *Board {
 	board := Board{
-		Input:   input,
-		Mapping: map[int]Loc{},
-		Seen:    map[int]bool{},
+		Input: input,
+		Items: map[int]*Item{},
 	}
 
 	lines := strings.Split(input, "\n")
@@ -44,8 +43,7 @@ func NewBoard(input string) *Board {
 				panic(err)
 			}
 
-			board.Seen[n] = false
-			board.Mapping[n] = Loc{i, j}
+			board.Items[n] = &Item{i, j, false}
 		}
 
 	}
@@ -54,28 +52,26 @@ func NewBoard(input string) *Board {
 }
 
 func (board *Board) Mark(n int) bool {
-	_, exists := board.Seen[n]
+	_, exists := board.Items[n]
 	if !exists {
 		return false
 	}
 
-	board.Seen[n] = true
+	item := board.Items[n]
+	item.Seen = true
 
-	loc := board.Mapping[n]
-	board.RowHits[loc.X]++
-	board.ColumnHits[loc.Y]++
+	board.RowHits[item.X]++
+	board.ColumnHits[item.Y]++
 
-	if board.RowHits[loc.X] == len(board.ColumnHits) {
-		// fmt.Printf("Winner: row %d\n", loc.X)
-		board.Winner = n
-		board.Won = true
+	if board.RowHits[item.X] == len(board.ColumnHits) {
+		// fmt.Printf("Winner: row %d\n", item.X)
+		board.Winner, board.Won = n, true
 		return true
 	}
 
-	if board.ColumnHits[loc.Y] == len(board.RowHits) {
-		// fmt.Printf("Winner: column %d\n", loc.Y)
-		board.Winner = n
-		board.Won = true
+	if board.ColumnHits[item.Y] == len(board.RowHits) {
+		// fmt.Printf("Winner: column %d\n", item.Y)
+		board.Winner, board.Won = n, true
 		return true
 	}
 
@@ -85,8 +81,8 @@ func (board *Board) Mark(n int) bool {
 func (board *Board) Score() int {
 	sum := 0
 
-	for n, seen := range board.Seen {
-		if !seen {
+	for n, item := range board.Items {
+		if !item.Seen {
 			sum += n
 		}
 	}
