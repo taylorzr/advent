@@ -48,55 +48,17 @@ func (line *Line) IsDiagonal() bool {
 }
 
 func (line *Line) DrawOn(m *Chart) {
-	// Vertical Line
-	if line.Start.X == line.End.X {
-		start, end := line.Start.Y, line.End.Y
-
-		if line.Start.Y > line.End.Y {
-			start, end = end, start
-		}
-
-		x := line.Start.X
-		for i := start; i <= end; i++ {
-			loc := Loc{X: x, Y: i}
-			m.LocCounts[loc]++
-		}
-		return
-	}
-
-	// Horizontal Line
-	if line.Start.Y == line.End.Y {
-		start, end := line.Start.X, line.End.X
-
-		if line.Start.X > line.End.X {
-			start, end = end, start
-		}
-
-		y := line.Start.Y
-		for i := start; i <= end; i++ {
-			loc := Loc{X: i, Y: y}
-			m.LocCounts[loc]++
-		}
-
-		return
-	}
-
-	// Diagonal Line
-	// start, end := line.Start, line.End
-	// if line.Start.X > line.End.X {
-	// 	start, end = end, start
-	// }
-
-	// // fmt.Printf("%+v -> %+v\n", start, end)
-
-	// x, y := start.X, start.Y
-	// if start.Y > end.Y {
-	// 	panic(fmt.Sprintf("bad assumption: %+v %+v\n", start, end))
-	// }
-
 	xd, yd := 1, 1
+
+	if line.Start.X == line.End.X {
+		xd = 0
+	}
 	if line.Start.X > line.End.X {
 		xd = -1
+	}
+
+	if line.Start.Y == line.End.Y {
+		yd = 0
 	}
 	if line.Start.Y > line.End.Y {
 		yd = -1
@@ -107,9 +69,7 @@ func (line *Line) DrawOn(m *Chart) {
 		loc := Loc{x, y}
 		m.LocCounts[loc]++
 
-		// fmt.Printf("%+v\n", loc)
-
-		if x == line.End.X {
+		if x == line.End.X && y == line.End.Y {
 			break
 		}
 
