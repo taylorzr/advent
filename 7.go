@@ -10,10 +10,7 @@ func CrabDance(input []int, part2 bool) int {
 	positions := make([]int, len(input))
 	copy(positions, input)
 	sort.Slice(positions, func(i, j int) bool { return positions[i] < positions[j] })
-	medianIndex := len(positions) / 2
-	median := positions[medianIndex]
-
-	fmt.Printf("%v\n", positions)
+	median := positions[len(positions)/2]
 
 	sum := 0
 	for _, n := range positions {
@@ -28,8 +25,8 @@ func CrabDance(input []int, part2 bool) int {
 		direction = -1
 	}
 
-	i := medianIndex
 	n := median
+	minN := median
 	minFuel := math.MaxFloat32
 	for {
 		fuel := 0.0
@@ -43,10 +40,12 @@ func CrabDance(input []int, part2 bool) int {
 				fuel += (diff*diff + diff) / 2
 			}
 		}
-		fmt.Printf("i: %d n: %d fuel %d\n", i, n, int(fuel))
+		fmt.Printf("n: %d fuel %d\n", n, int(fuel))
 		if fuel <= minFuel {
+			minN = n
 			minFuel = fuel
 		} else {
+			fmt.Printf("minN: %d minFuel: %d\n", minN, int(minFuel))
 			break
 		}
 		// i += direction
