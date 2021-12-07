@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-func CrabDance(input []int) int {
+func CrabDance(input []int, part2 bool) int {
 	positions := make([]int, len(input))
 	copy(positions, input)
 	sort.Slice(positions, func(i, j int) bool { return positions[i] < positions[j] })
@@ -19,7 +19,7 @@ func CrabDance(input []int) int {
 	for _, n := range positions {
 		sum += n
 	}
-	avg := sum / len(positions)
+	avg := int(math.Round(float64(sum) / float64(len(positions))))
 
 	fmt.Printf("median: %d avg: %d sum: %d\n", median, avg, sum)
 
@@ -29,13 +29,19 @@ func CrabDance(input []int) int {
 	}
 
 	i := medianIndex
+	n := median
 	minFuel := math.MaxFloat32
 	for {
 		fuel := 0.0
-		n := positions[i]
+		// n := positions[i]
 
 		for _, position := range positions {
-			fuel += math.Abs(float64(position) - float64(n))
+			if !part2 {
+				fuel += math.Abs(float64(position) - float64(n))
+			} else {
+				diff := math.Abs(float64(position) - float64(n))
+				fuel += (diff*diff + diff) / 2
+			}
 		}
 		fmt.Printf("i: %d n: %d fuel %d\n", i, n, int(fuel))
 		if fuel <= minFuel {
@@ -43,7 +49,8 @@ func CrabDance(input []int) int {
 		} else {
 			break
 		}
-		i += direction
+		// i += direction
+		n += direction
 
 	}
 
