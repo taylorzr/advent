@@ -1,10 +1,18 @@
 package advent
 
 func allBirths(daysUntil []int, remainingDays int) int {
-	sum := 0
-	for _, days := range daysUntil {
-		sum += births(days, remainingDays)
+
+	daysToCounts := map[int]int{}
+
+	for _, day := range daysUntil {
+		daysToCounts[day] += 1
 	}
+
+	sum := 0
+	for days, count := range daysToCounts {
+		sum += births(days, remainingDays) * count
+	}
+
 	return sum
 }
 
