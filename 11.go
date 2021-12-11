@@ -24,6 +24,7 @@ func OctoLights(input string, times int) int {
 		// octopi.Print()
 
 		// flash
+		allFlash := true
 		for _, octopus := range octopi.grid {
 			if octopus.energy == 9 {
 				flashes += 1
@@ -31,11 +32,16 @@ func OctoLights(input string, times int) int {
 				octopus.flashed = false
 			} else {
 				octopus.energy += 1
+				allFlash = false
 			}
 		}
 
 		fmt.Printf("After step %d:\n", i+1)
 		octopi.Print()
+
+		if allFlash {
+			panic("All flashed!")
+		}
 	}
 
 	return flashes
