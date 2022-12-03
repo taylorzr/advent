@@ -1,78 +1,48 @@
 open Format
 open Advent
 
-let n = Str.regexp "\n";;
-let s = Str.regexp " ";;
+let char_pos c =
+  let n = Char.code c in
+  if n < 97 then n - 64 + 26 else n - 96
 
-let item_values = Hashtbl.create 3;;
-Hashtbl.add item_values "rock" 1;;
-Hashtbl.add item_values "paper" 2;;
-Hashtbl.add item_values "scissors" 3;;
+let dupes string = 
+  (* could use Hashtbl.lenght instead of n *)
+  let rec aux acc n = function
+    | [] -> acc
+    | (char :: t) -> (if n > 0 then
+      if Hashtbl.mem acc char then () else Hashtbl.add acc char 1
+    else
+      if Hashtbl.mem acc char then Hashtbl.replace acc char 2
+    ); aux acc (n-1) t
+  in
+  let n = List.length string / 2
+  in
+  let counts = aux (Hashtbl.create n) n string
+  in
+  Hashtbl.fold (fun k v acc->
+    if v > 1 then (
+      printf "%c %d %d\n" k v (char_pos k);
+      acc + (char_pos k)
+    ) else
+      acc
+  ) counts 0
+;;
 
-let lose_to = Hashtbl.create 3;;
-Hashtbl.add lose_to "rock" "scissors";;
-Hashtbl.add lose_to "paper" "rock";;
-Hashtbl.add lose_to "scissors" "paper";;
-
-let win_against = Hashtbl.create 3;;
-Hashtbl.add win_against "rock" "paper";;
-Hashtbl.add win_against "paper" "scissors";;
-Hashtbl.add win_against "scissors" "rock";;
-
-let load input =
-  Str.split n input
-  |> List.map (fun game ->
-      Str.split s game
-      |> List.map(fun item ->
-          match item with
-          | "A" | "X" -> "rock"
-          | "B" | "Y" -> "paper"
-          | "C" | "Z" -> "scissors"
-          | _ -> failwith "oops"
-      )
+let load input = 
+  Str.split (Str.regexp "\n") input
+    |> List.map (fun line ->
+    Str.split (Str.regexp "") line
+      |> List.map (fun s -> 
+          (* printf "%s\n" s; *)
+          String.get s 0)
   )
 ;;
 
-let score game =
-  let x = match game with
-  | [_; b] -> Hashtbl.find item_values b
-  | _ -> 0 in
-  let y = match game with
-  | [a; b] when a == b -> 3
-  | ["scissors"; "rock"] -> 6
-  | ["rock"; "paper"] -> 6
-  | ["paper"; "scissors"] -> 6
-  | _ -> 0 in
-  (* printf "%d + %d\n" x y;  *)
-  x + y
-;;
+(* dupes (load d3sample) |> printf "%d\n" *)
+let values = load d3sample |> List.map dupes;;
+List.iter (printf "%d\n") values;;
+values |> List.fold_left (+) 0 |> printf "%d\n";;
 
-let load2 input =
-  Str.split n input
-  |> List.map (fun game ->
-      Str.split s game
-      |> List.map(fun item ->
-          match item with
-          | "A" ->  "rock"
-          | "B" ->  "paper"
-          | "C" ->  "scissors"
-          | "X" ->  "lose"
-          | "Y" ->  "draw"
-          | "Z" ->  "win"
-          | _ -> failwith "oops"
-      )
-  )
-;;
-
-let score2 game =
-  match game with
-  | [a; "draw"] -> 3 + Hashtbl.find item_values a
-  | [a; "lose"] -> 0 + Hashtbl.find item_values (Hashtbl.find lose_to a)
-  | [a; "win"] -> 6 + Hashtbl.find item_values (Hashtbl.find win_against a)
-  | _ -> 0
-;;
-
-load d2sample |> List.map score |> List.fold_left (+) 0 |> printf "%d\n";;
-load d2input |> List.map score |> List.fold_left (+) 0 |> printf "%d\n";;
-load2 d2sample |> List.map score2 |> List.fold_left (+) 0 |> printf "%d\n";;
-load2 d2input |> List.map score2 |> List.fold_left (+) 0 |> printf "%d\n";;
+let values = load d3input |> List.map dupes;;
+(* List.iter (printf "%d\n") values;; *)
+values |> List.fold_left (+) 0 |> printf "%d\n";;
