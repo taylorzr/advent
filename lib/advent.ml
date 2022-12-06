@@ -3828,3 +3828,14 @@ let d4input = "
 41-60,94-94
 28-60,3-29
 ";;
+
+let d5sample = "
+    [D]    
+[N] [C]    
+[Z] [M] [P]
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
+"
