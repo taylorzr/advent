@@ -3829,6 +3829,8 @@ let d4input = "
 28-60,3-29
 ";;
 
+(* List.iteri (fun i x -> printf "%d: %d\n" i x) [1;2;3;4] *)
+
 let d5sample = "
     [D]    
 [N] [C]    
